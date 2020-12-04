@@ -9,7 +9,7 @@ output:
 knitr::opts_chunk$set(cache = TRUE)
 
 library(readr)
-library(lubridate)
+library(magrittr)
 setwd("/Users/ashipunova/work/data_science_coursera/intro_r/RepData_PeerAssessment1/")
 ```
 
@@ -27,7 +27,15 @@ str(activity_data)
 ## What is mean total number of steps taken per day?
 
 ```{r}
-aggregate(steps ~ date, activity_data, mean, na.rm = T)
+# aggregate(steps ~ date, activity_data, mean, na.rm = T)
+sums <- aggregate(x = activity_data$steps,                # Specify data column
+  by = list(activity_data$date),              # Specify group indicator
+  FUN = sum)                            # Specify function (i.e. sum)
+tot_by2 <- aggregate(steps ~ date, activity_data, mean, na.rm = T)
+aggregate(x = activity_data$steps,                # Specify data column
+  by = list(activity_data$date),              # Specify group indicator
+  FUN = mean, na.rm = T)                            # Specify function (i.e. sum)
+
 
 ```
 
