@@ -10,6 +10,8 @@ knitr::opts_chunk$set(cache = TRUE)
 
 library(readr)
 library(magrittr)
+library(ggplot2)
+library(dplyr)
 setwd("/Users/ashipunova/work/data_science_coursera/intro_r/RepData_PeerAssessment1/")
 ```
 
@@ -28,11 +30,20 @@ str(activity_data)
 
 ```{r}
 step_sums <- aggregate(steps ~ date, activity_data, sum, na.rm = T)
+sum_plot <- qplot(step_sums$steps, geom = "histogram") 
+print(sum_plot)
 
-step_means <- aggregate(steps ~ date, activity_data, mean, na.rm = T)
+activity_data %>%
+  group_by(date) %>%
+  summarise(
+    #sum = sum(steps, na.rm = T), 
+            mean = mean(steps, na.rm = T), 
+            median = median(steps, na.rm = T)) -> mean_med
 
+mean_med
+qplot(date, mean, data = mean_med)
+#step_means_medians <- 
 # qplot(date, steps, data = step_means, geom = "smooth")
-qplot(step_sums$steps, geom="histogram") 
 
 ```
 
