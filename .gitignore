@@ -1,0 +1,5 @@
+
+PA1_template_cache/html/__packages
+*.RData
+*.rdb
+*.rdx
