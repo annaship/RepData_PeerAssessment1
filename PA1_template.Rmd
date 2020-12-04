@@ -5,9 +5,18 @@ output:
     keep_md: true
 ---
 
+```{r}
+library(readr)
+setwd("/Users/ashipunova/work/data_science_coursera/intro_r/RepData_PeerAssessment1/")
+```
 
 ## Loading and preprocessing the data
+```{r}
+# unzip("sales.zip", list = TRUE)
+activity_data <- readr::read_csv(unzip("activity.zip", "activity.csv"))
 
+str(activity_data)
+```
 
 
 ## What is mean total number of steps taken per day?
