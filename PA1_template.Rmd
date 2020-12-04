@@ -6,7 +6,10 @@ output:
 ---
 
 ```{r}
+knitr::opts_chunk$set(cache = TRUE)
+
 library(readr)
+library(lubridate)
 setwd("/Users/ashipunova/work/data_science_coursera/intro_r/RepData_PeerAssessment1/")
 ```
 
@@ -16,6 +19,8 @@ setwd("/Users/ashipunova/work/data_science_coursera/intro_r/RepData_PeerAssessme
 activity_data <- readr::read_csv(unzip("activity.zip", "activity.csv"))
 
 str(activity_data)
+# transform(activity_data, date = ymd(date))
+
 ```
 
 
