@@ -174,9 +174,9 @@ For this part the weekdays() function may be of some help here. Use the dataset 
 imputed_dataset$weekday <- weekdays(imputed_dataset$date, abbreviate = T)
 weekends <- list("Sat", "Sun")
 is_weekend = function(x) {
-  x %in% weekends
+  if_else(x %in% weekends, "weekend", "weekday")
 }
-imputed_dataset$is_weekend <- sapply(imputed_dataset$weekday, is_weekend)
+imputed_dataset$is_weekend <- as.factor(sapply(imputed_dataset$weekday, is_weekend))
 
 imputed_dataset %>% head(3)
 ```
