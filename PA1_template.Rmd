@@ -177,6 +177,12 @@ is_weekend = function(x) {
   if_else(x %in% weekends, "weekend", "weekday")
 }
 imputed_dataset$is_weekend <- as.factor(sapply(imputed_dataset$weekday, is_weekend))
+(diamonds, aes(carat, price)) + geom_boxplot() + facet_grid(. ~ cut)
+g <- ggplot(diamonds,aes(depth,price))
+g + geom_point(alpha = 1/3) + facet_grid(cut ~ car2)
+
+
+qplot(as.factor(year), Emissions, data = vehicle_df_nei_LA, facets = . ~ as.factor(SCC)) + labs(x = "Years", title = "Emissions from coal combustion-related sources")
 
 imputed_dataset %>% head(3)
 ```
@@ -186,16 +192,35 @@ imputed_dataset %>% head(3)
 ```{r weekday_plot}
 step_interv_week <- aggregate(step_imp ~ interval + is_weekend, imputed_dataset, mean, na.rm = T)
 
-step_interv_weekdays <- filter(step_interv_week, is_weekend == "weekday")
-step_interv_weekends <- filter(step_interv_week, is_weekend == "weekend")
+# step_interv_weekdays <- filter(step_interv_week, is_weekend == "weekday")
+# step_interv_weekends <- filter(step_interv_week, is_weekend == "weekend")
 
-par(mfrow = c(2,1))
-with(step_interv_weekdays, plot(interval, step_imp, type = "l"))
-with(step_interv_weekends, plot(interval, step_imp, type = "l"))
+# par(mfrow = c(2,1))
+# with(step_interv_weekdays, plot(interval, step_imp, type = "l"))
+# with(step_interv_weekends, plot(interval, step_imp, type = "l"))
 
-p_avg_activ_imp = ggplot(data = step_interv_week, 
+# p_avg_activ_imp = facet_wrap(
+#   facets,
+#   nrow = NULL,
+#   ncol = NULL)
+
+# qplot(as.factor(year), Emissions, data = vehicle_df_nei_LA, facets = . ~ as.factor(SCC)) + labs(x = "Years", title = "Emissions from coal combustion-related sources")
+#g <- ggplot(diamonds,aes(depth,price))
+#g + geom_point(alpha = 1/3) + facet_grid(cut ~ car2)
+#(diamonds, aes(carat, price)) + geom_boxplot() + facet_grid(. ~ cut)
+
+p_avg_activ_imp <- ggplot(data = step_interv_week, 
                      aes(x = interval,
-                         y = step_imp, group = is_weekend)) +
-              geom_line()
+                         y = step_imp)) +
+  geom_line(color = rgb(90, 163, 252, maxColorValue = 255)) +
+  facet_wrap(~is_weekend, nrow = 2) + 
+  labs(x = "Interval", y = "Number of steps") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        strip.background = element_rect(fill = rgb(254,	229, 205, maxColorValue = 255))
+        )
+
+
 p_avg_activ_imp
 ```
