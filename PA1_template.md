@@ -305,31 +305,57 @@ imputed_dataset %>% head
 ## 6 2012-10-01       25    2.09
 ```
 
-4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+4. Make a histogram of the total number of steps taken each day and 
+
+#```{r new_tot, ref.label=c('step_sums', 'sum_hist')}
+#<<step_sums>>
+#```
 
 
 ```r
-step_sums <- aggregate(steps ~ date, activity_data, sum, na.rm = T)
-step_sums %>% head()
+step_sums_imp <- aggregate(step_mean ~ date, imputed_dataset, sum, na.rm = T)
+step_sums_imp %>% head(3)
 ```
 
 ```
-##         date steps
-## 1 2012-10-02   126
-## 2 2012-10-03 11352
-## 3 2012-10-04 12116
-## 4 2012-10-05 13294
-## 5 2012-10-06 15420
-## 6 2012-10-07 11015
+##         date step_mean
+## 1 2012-10-01  10766.19
+## 2 2012-10-02    126.00
+## 3 2012-10-03  11352.00
 ```
 
 ```r
-sum_plot <- qplot(step_sums$steps, geom = "histogram", binwidth = 25000/5) 
+sum_imp_plot <- qplot(step_sums$steps, geom = "histogram", binwidth = 25000/5) 
 print(sum_plot)
 ```
 
 ![](PA1_template_files/figure-html/new_tot-1.png)<!-- -->
 
+Calculate and report the mean and median total number of steps taken per day.
+
+
+```r
+imputed_dataset %>%
+  group_by(date) %>%
+  summarise(
+    sum = sum(step_mean, na.rm = T), 
+    mean = mean(step_mean, na.rm = T), 
+    median = median(step_mean, na.rm = T)) %T>% head(3) %>%
+    {.} -> mean_med_imp
+```
+
+```
+## `summarise()` ungrouping output (override with `.groups` argument)
+```
+
+```r
+#mean_med_imp
+```
+
+### Do these values differ from the estimates from the first part of the assignment? 
+Yes
+
+### What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
