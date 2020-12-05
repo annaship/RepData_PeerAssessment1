@@ -89,12 +89,18 @@ step_interv[step_interv$steps == max(step_interv$steps), ]
 ```{r miss_tot}
 sapply(activity_data, function(x) sum(is.na(x)))
 
+# NAs by day:
+table(activity_data$date, is.na(activity_data$steps))
+
 ```
 
 2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.  
 
 ```{r fill_in}
-
+activity_data$step_mean <- ave(activity_data$steps, activity_data$interval, 
+                          FUN = function(x) ifelse(is.na(x), mean(x, na.rm = TRUE), x))
+# activity_data$step_mean %>% head
+sapply(activity_data, function(x) sum(is.na(x)))
 
 ```
 
