@@ -97,6 +97,7 @@ table(activity_data$date, is.na(activity_data$steps)) %>% head(3)
 
 2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.  
 
+Imputing missing values using the mean for that 5-minute interval.  
 ```{r fill_in}
 activity_data$step_imp <- ave(activity_data$steps, activity_data$interval, 
                           FUN = function(x) ifelse(is.na(x), mean(x, na.rm = TRUE), x))
@@ -167,6 +168,18 @@ No impact
 
 For this part the weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
 
-1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.  
+1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day. 
+
+```{r week}
+imputed_dataset$weekday <- weekdays(imputed_dataset$date, abbreviate = T)
+weekends <- list("Sat", "Sun")
+is_weekend = function(x) {
+  x %in% weekends
+}
+imputed_dataset$is_weekend <- sapply(imputed_dataset$weekday, is_weekend)
+
+imputed_dataset %>% head(3)
+```
+
 2. Make a panel plot containing a time series plot (i.e. \color{red}{\verb|type = "l"|}type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
 
