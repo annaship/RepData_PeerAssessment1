@@ -7,7 +7,7 @@ output:
 
 
 ```r
-knitr::opts_chunk$set(cache = F)
+knitr::opts_chunk$set(cache = F, echo = TRUE)
 
 library(readr)
 library(magrittr)
@@ -33,13 +33,17 @@ library(dplyr)
 ```
 
 ```r
-setwd("/Users/ashipunova/work/data_science_coursera/intro_r/RepData_PeerAssessment1/")
+if(!file.exists("./data")){ dir.create("./data") }
+
+setwd("./data")
 ```
 
 ## Loading and preprocessing the data
+1. Load the data (i.e. read.csv())  
+2. Process/transform the data (if necessary) into a format suitable for your analysis  
+
 
 ```r
-# unzip("sales.zip", list = TRUE)
 activity_data <- readr::read_csv(unzip("activity.zip", "activity.csv"))
 ```
 
@@ -70,12 +74,10 @@ str(activity_data)
 ##   .. )
 ```
 
-```r
-# transform(activity_data, date = ymd(date))
-```
-
 
 ## What is mean total number of steps taken per day?
+
+For this part of the assignment, you can ignore the missing values in the dataset.
 
 1. Calculate the total number of steps taken per day
 
@@ -95,7 +97,7 @@ step_sums %>% head()
 ## 6 2012-10-07 11015
 ```
 
-2. If you do not understand the difference between a histogram and a barplot, research the difference between them. Make a histogram of the total number of steps taken each day
+2. Make a histogram of the total number of steps taken each day
 
 
 ```r
@@ -142,12 +144,6 @@ mean_med
 ## # … with 51 more rows
 ```
 
-```r
-# qplot(date, mean, data = mean_med)
-#step_means_medians <- 
-# qplot(date, steps, data = step_means, geom = "smooth")
-```
-
 ## What is the average daily activity pattern?  
 
 1. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
@@ -161,15 +157,7 @@ plot(step_interv$interval, step_interv$steps, type = "l")
 
 ![](PA1_template_files/figure-html/interval.steps-1.png)<!-- -->
 
-```r
-p_avg_activ = ggplot(data = step_interv, 
-                     aes(x = interval,
-                         y = steps, group = date)) +
-              geom_line()
-p_avg_activ
-```
 
-![](PA1_template_files/figure-html/interval.steps-2.png)<!-- -->
 
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
@@ -182,6 +170,8 @@ step_interv[step_interv$steps == max(step_interv$steps), ]
 ##       interval       date steps
 ## 14476      615 2012-11-27   806
 ```
+
+615
 
 ## Imputing missing values
 
@@ -199,15 +189,22 @@ sapply(activity_data, function(x) sum(is.na(x)))
 
 ```r
 # NAs by day:
-table(activity_data$date, is.na(activity_data$steps)) %>% head(3)
+# Days with NAs:
+table(activity_data$date, is.na(activity_data$steps)) %>% as.data.frame() -> days_w_nas
+names(days_w_nas) <- c("day", "has_nas", "freq")
+days_w_nas %>% filter(freq > 0 & has_nas == TRUE) %>% select(day)
 ```
 
 ```
-##             
-##              FALSE TRUE
-##   2012-10-01     0  288
-##   2012-10-02   288    0
-##   2012-10-03   288    0
+##          day
+## 1 2012-10-01
+## 2 2012-10-08
+## 3 2012-11-01
+## 4 2012-11-04
+## 5 2012-11-09
+## 6 2012-11-10
+## 7 2012-11-14
+## 8 2012-11-30
 ```
 
 2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.  
@@ -236,11 +233,7 @@ activity_data %>% select(-c("steps")) %>%
 #imputed_dataset %>% head
 ```
 
-4. Make a histogram of the total number of steps taken each day and 
-
-#```{r new_tot, ref.label=c('step_sums', 'sum_hist')}
-#<<step_sums>>
-#```
+4. Make a histogram of the total number of steps taken each day
 
 
 ```r
@@ -376,23 +369,6 @@ imputed_dataset %>% head(3)
 ```r
 step_interv_week <- aggregate(step_imp ~ interval + is_weekend, imputed_dataset, mean, na.rm = T)
 
-# step_interv_weekdays <- filter(step_interv_week, is_weekend == "weekday")
-# step_interv_weekends <- filter(step_interv_week, is_weekend == "weekend")
-
-# par(mfrow = c(2,1))
-# with(step_interv_weekdays, plot(interval, step_imp, type = "l"))
-# with(step_interv_weekends, plot(interval, step_imp, type = "l"))
-
-# p_avg_activ_imp = facet_wrap(
-#   facets,
-#   nrow = NULL,
-#   ncol = NULL)
-
-# qplot(as.factor(year), Emissions, data = vehicle_df_nei_LA, facets = . ~ as.factor(SCC)) + labs(x = "Years", title = "Emissions from coal combustion-related sources")
-#g <- ggplot(diamonds,aes(depth,price))
-#g + geom_point(alpha = 1/3) + facet_grid(cut ~ car2)
-#(diamonds, aes(carat, price)) + geom_boxplot() + facet_grid(. ~ cut)
-
 p_avg_activ_imp <- ggplot(data = step_interv_week, 
                      aes(x = interval,
                          y = step_imp)) +
@@ -404,7 +380,6 @@ p_avg_activ_imp <- ggplot(data = step_interv_week,
         panel.grid.minor = element_blank(), 
         strip.background = element_rect(fill = rgb(254,	229, 205, maxColorValue = 255))
         )
-
 
 p_avg_activ_imp
 ```
