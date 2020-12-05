@@ -80,15 +80,11 @@ str(activity_data)
 
 ```r
 step_sums <- aggregate(steps ~ date, activity_data, sum, na.rm = T)
-sum_plot <- qplot(step_sums$steps, geom = "histogram") 
+sum_plot <- qplot(step_sums$steps, geom = "histogram", binwidth = 25000/5) 
 print(sum_plot)
 ```
 
-```
-## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-```
-
-![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+![](PA1_template_files/figure-html/mean_med-1.png)<!-- -->
 
 ```r
 activity_data %>%
@@ -104,7 +100,7 @@ activity_data %>%
 ```
 
 ```r
-print(mean_med)
+mean_med
 ```
 
 ```
@@ -125,21 +121,33 @@ print(mean_med)
 ```
 
 ```r
-qplot(date, mean, data = mean_med)
-```
-
-```
-## Warning: Removed 8 rows containing missing values (geom_point).
-```
-
-![](PA1_template_files/figure-html/unnamed-chunk-3-2.png)<!-- -->
-
-```r
+# qplot(date, mean, data = mean_med)
 #step_means_medians <- 
 # qplot(date, steps, data = step_means, geom = "smooth")
 ```
 
-## What is the average daily activity pattern?
+## What is the average daily activity pattern?  
+
+### Make a time series plot (i.e. \color{red}{\verb|type = "l"|}type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+
+
+```r
+ag <- aggregate(steps ~ date, activity_data, mean, na.rm = T)
+names(ag) = c("date", "avg_steps")
+avg_steps_per_day <- merge(activity_data, ag, by = "date")
+names(avg_steps_per_day) = c("dates", "steps", "intervals", "avg_steps")
+p_avg_activ = ggplot(data = avg_steps_per_day, 
+                     aes(x = intervals,
+                         y = avg_steps)) +
+              geom_line() +
+              geom_point()
+
+p_avg_activ
+```
+
+![](PA1_template_files/figure-html/interval.steps-1.png)<!-- -->
+
+### Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 
 

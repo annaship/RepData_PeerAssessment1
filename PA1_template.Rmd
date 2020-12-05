@@ -5,7 +5,7 @@ output:
     keep_md: true
 ---
 
-```{r}
+```{r start}
 knitr::opts_chunk$set(cache = TRUE)
 
 library(readr)
@@ -16,7 +16,7 @@ setwd("/Users/ashipunova/work/data_science_coursera/intro_r/RepData_PeerAssessme
 ```
 
 ## Loading and preprocessing the data
-```{r}
+```{r read.csv}
 # unzip("sales.zip", list = TRUE)
 activity_data <- readr::read_csv(unzip("activity.zip", "activity.csv"))
 
@@ -28,9 +28,9 @@ str(activity_data)
 
 ## What is mean total number of steps taken per day?
 
-```{r}
+```{r mean_med}
 step_sums <- aggregate(steps ~ date, activity_data, sum, na.rm = T)
-sum_plot <- qplot(step_sums$steps, geom = "histogram") 
+sum_plot <- qplot(step_sums$steps, geom = "histogram", binwidth = 25000/5) 
 print(sum_plot)
 
 activity_data %>%
@@ -41,18 +41,43 @@ activity_data %>%
             median = median(steps, na.rm = T)) -> mean_med
 
 mean_med
-qplot(date, mean, data = mean_med)
+# qplot(date, mean, data = mean_med)
 #step_means_medians <- 
 # qplot(date, steps, data = step_means, geom = "smooth")
 
 ```
 
-## What is the average daily activity pattern?
+## What is the average daily activity pattern?  
+
+### Make a time series plot (i.e. \color{red}{\verb|type = "l"|}type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+
+```{r interval.steps}
+ag <- aggregate(steps ~ date, activity_data, mean, na.rm = T)
+names(ag) = c("date", "avg_steps")
+avg_steps_per_day <- merge(activity_data, ag, by = "date")
+names(avg_steps_per_day) = c("dates", "steps", "intervals", "avg_steps")
+p_avg_activ = ggplot(data = avg_steps_per_day, 
+                     aes(x = intervals,
+                         y = avg_steps)) +
+              geom_line() +
+              geom_point()
+
+p_avg_activ
+
+```
+
+### Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+step_interv <- aggregate(steps ~ interval + date , activity_data, mean, na.rm = T)
 
 
+wich.max(avg_steps_per_day)
 
 ## Imputing missing values
 
+Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with \color{red}{\verb|NA|}NAs)
+Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
+Create a new dataset that is equal to the original dataset but with the missing data filled in.
+Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
