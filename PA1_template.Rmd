@@ -6,7 +6,7 @@ output:
 ---
 
 ```{r start}
-knitr::opts_chunk$set(cache = TRUE)
+knitr::opts_chunk$set(cache = F)
 
 library(readr)
 library(magrittr)
@@ -177,12 +177,6 @@ is_weekend = function(x) {
   if_else(x %in% weekends, "weekend", "weekday")
 }
 imputed_dataset$is_weekend <- as.factor(sapply(imputed_dataset$weekday, is_weekend))
-(diamonds, aes(carat, price)) + geom_boxplot() + facet_grid(. ~ cut)
-g <- ggplot(diamonds,aes(depth,price))
-g + geom_point(alpha = 1/3) + facet_grid(cut ~ car2)
-
-
-qplot(as.factor(year), Emissions, data = vehicle_df_nei_LA, facets = . ~ as.factor(SCC)) + labs(x = "Years", title = "Emissions from coal combustion-related sources")
 
 imputed_dataset %>% head(3)
 ```

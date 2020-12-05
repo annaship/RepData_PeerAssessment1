@@ -7,7 +7,7 @@ output:
 
 
 ```r
-knitr::opts_chunk$set(cache = TRUE)
+knitr::opts_chunk$set(cache = F)
 
 library(readr)
 library(magrittr)
@@ -212,6 +212,7 @@ table(activity_data$date, is.na(activity_data$steps)) %>% head(3)
 
 2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.  
 
+Imputing missing values using the mean for that 5-minute interval.  
 
 ```r
 activity_data$step_imp <- ave(activity_data$steps, activity_data$interval, 
@@ -243,19 +244,16 @@ activity_data %>% select(-c("steps")) %>%
 
 
 ```r
-imputed_dataset %>% head
+imputed_dataset %>% head(3)
 ```
 
 ```
-## # A tibble: 6 x 3
+## # A tibble: 3 x 3
 ##   date       interval step_imp
 ##   <date>        <dbl>    <dbl>
-## 1 2012-10-01        0   1.72  
-## 2 2012-10-01        5   0.340 
-## 3 2012-10-01       10   0.132 
-## 4 2012-10-01       15   0.151 
-## 5 2012-10-01       20   0.0755
-## 6 2012-10-01       25   2.09
+## 1 2012-10-01        0    1.72 
+## 2 2012-10-01        5    0.340
+## 3 2012-10-01       10    0.132
 ```
 
 ```r
@@ -342,19 +340,6 @@ summary(imputed_dataset$step_imp)
 ```
 
 
-```r
-summary(mean_med_imp)
-```
-
-```
-##       date                 sum             mean             median      
-##  Min.   :2012-10-01   Min.   :   41   Min.   : 0.1424   Min.   : 0.000  
-##  1st Qu.:2012-10-16   1st Qu.: 9819   1st Qu.:34.0938   1st Qu.: 0.000  
-##  Median :2012-10-31   Median :10766   Median :37.3826   Median : 0.000  
-##  Mean   :2012-10-31   Mean   :10766   Mean   :37.3826   Mean   : 4.474  
-##  3rd Qu.:2012-11-15   3rd Qu.:12811   3rd Qu.:44.4826   3rd Qu.: 0.000  
-##  Max.   :2012-11-30   Max.   :21194   Max.   :73.5903   Max.   :34.113
-```
 
 No impact
 
@@ -362,6 +347,66 @@ No impact
 
 For this part the weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
 
-1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.  
-2. Make a panel plot containing a time series plot (i.e. \color{red}{\verb|type = "l"|}type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
+1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day. 
 
+
+```r
+imputed_dataset$weekday <- weekdays(imputed_dataset$date, abbreviate = T)
+weekends <- list("Sat", "Sun")
+is_weekend = function(x) {
+  if_else(x %in% weekends, "weekend", "weekday")
+}
+imputed_dataset$is_weekend <- as.factor(sapply(imputed_dataset$weekday, is_weekend))
+
+imputed_dataset %>% head(3)
+```
+
+```
+## # A tibble: 3 x 5
+##   date       interval step_imp weekday is_weekend
+##   <date>        <dbl>    <dbl> <chr>   <fct>     
+## 1 2012-10-01        0    1.72  Mon     weekday   
+## 2 2012-10-01        5    0.340 Mon     weekday   
+## 3 2012-10-01       10    0.132 Mon     weekday
+```
+
+2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
+
+
+```r
+step_interv_week <- aggregate(step_imp ~ interval + is_weekend, imputed_dataset, mean, na.rm = T)
+
+# step_interv_weekdays <- filter(step_interv_week, is_weekend == "weekday")
+# step_interv_weekends <- filter(step_interv_week, is_weekend == "weekend")
+
+# par(mfrow = c(2,1))
+# with(step_interv_weekdays, plot(interval, step_imp, type = "l"))
+# with(step_interv_weekends, plot(interval, step_imp, type = "l"))
+
+# p_avg_activ_imp = facet_wrap(
+#   facets,
+#   nrow = NULL,
+#   ncol = NULL)
+
+# qplot(as.factor(year), Emissions, data = vehicle_df_nei_LA, facets = . ~ as.factor(SCC)) + labs(x = "Years", title = "Emissions from coal combustion-related sources")
+#g <- ggplot(diamonds,aes(depth,price))
+#g + geom_point(alpha = 1/3) + facet_grid(cut ~ car2)
+#(diamonds, aes(carat, price)) + geom_boxplot() + facet_grid(. ~ cut)
+
+p_avg_activ_imp <- ggplot(data = step_interv_week, 
+                     aes(x = interval,
+                         y = step_imp)) +
+  geom_line(color = rgb(90, 163, 252, maxColorValue = 255)) +
+  facet_wrap(~is_weekend, nrow = 2) + 
+  labs(x = "Interval", y = "Number of steps") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        strip.background = element_rect(fill = rgb(254,	229, 205, maxColorValue = 255))
+        )
+
+
+p_avg_activ_imp
+```
+
+![](PA1_template_files/figure-html/weekday_plot-1.png)<!-- -->
