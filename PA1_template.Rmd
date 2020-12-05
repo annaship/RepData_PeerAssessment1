@@ -181,5 +181,21 @@ imputed_dataset$is_weekend <- as.factor(sapply(imputed_dataset$weekday, is_weeke
 imputed_dataset %>% head(3)
 ```
 
-2. Make a panel plot containing a time series plot (i.e. \color{red}{\verb|type = "l"|}type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
+2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
 
+```{r weekday_plot}
+step_interv_week <- aggregate(step_imp ~ interval + is_weekend, imputed_dataset, mean, na.rm = T)
+
+step_interv_weekdays <- filter(step_interv_week, is_weekend == "weekday")
+step_interv_weekends <- filter(step_interv_week, is_weekend == "weekend")
+
+par(mfrow = c(2,1))
+with(step_interv_weekdays, plot(interval, step_imp, type = "l"))
+with(step_interv_weekends, plot(interval, step_imp, type = "l"))
+
+p_avg_activ_imp = ggplot(data = step_interv_week, 
+                     aes(x = interval,
+                         y = step_imp, group = is_weekend)) +
+              geom_line()
+p_avg_activ_imp
+```
